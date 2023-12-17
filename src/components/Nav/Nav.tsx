@@ -32,7 +32,7 @@ export const Nav = () => {
 
   return (
     <motion.nav
-      className="absolute top-0 right-0 bottom-0 w-[300px]"
+      className="absolute top-0 right-0 bottom-0 w-[300px] z-30"
       initial={false}
       animate={isOpen ? 'open' : 'closed'}
       custom={height}

@@ -1,40 +1,68 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useRef } from 'react'
+import {
+  motion,
+  useScroll,
+  useSpring,
+  useTransform,
+  useMotionValue,
+  useVelocity,
+  useAnimationFrame,
+} from 'framer-motion'
+import { wrap } from '@motionone/utils'
 
-const text = 'Hello, World!'
-const textArray = text.split('')
+interface ParallaxProps {
+  children: string
+  baseVelocity: number
+}
 
-const text2 = 'This is Zoey`s Portfolio!'
-const textArray2 = text2.split('')
+function ParallaxText({ children, baseVelocity = 100 }: ParallaxProps) {
+  const baseX = useMotionValue(0)
+  const { scrollY } = useScroll()
+  const scrollVelocity = useVelocity(scrollY)
+  const smoothVelocity = useSpring(scrollVelocity, {
+    damping: 50,
+    stiffness: 400,
+  })
+  const velocityFactor = useTransform(smoothVelocity, [0, 1000], [0, 5], {
+    clamp: false,
+  })
 
-export const MainText = () => {
+  const x = useTransform(baseX, (v) => `${wrap(-20, -45, v)}%`)
+
+  const directionFactor = useRef<number>(1)
+  useAnimationFrame((t, delta) => {
+    let moveBy = directionFactor.current * baseVelocity * (delta / 1000)
+
+    if (velocityFactor.get() < 0) {
+      directionFactor.current = -1
+    } else if (velocityFactor.get() > 0) {
+      directionFactor.current = 1
+    }
+
+    moveBy += directionFactor.current * moveBy * velocityFactor.get()
+
+    baseX.set(baseX.get() + moveBy)
+  })
+
   return (
-    <div className="text-[4rem] font-bold ml-[2rem] mb-[14rem] flex flex-col" style={{ overflow: 'hidden' }}>
-      <div>
-        {textArray.map((char, index) => (
-          <motion.span
-            key={index}
-            initial={{ opacity: 0, scale: 0, rotate: 360 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ delay: 0.05 * index, type: 'spring', stiffness: 260, damping: 20 }}
-          >
-            {char}
-          </motion.span>
-        ))}
-      </div>
-      <div>
-        {textArray2.map((char, index) => (
-          <motion.span
-            key={`second-${index}`}
-            initial={{ opacity: 0, scale: 0, rotate: 360 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ delay: 0.05 * (textArray.length + index), type: 'spring', stiffness: 260, damping: 20 }}
-          >
-            {char}
-          </motion.span>
-        ))}
-      </div>
+    <div className="font-semibold uppercase text-8xl flex whitespace-nowrap flex-nowrap">
+      <motion.div className="scroller" style={{ x }}>
+        <span>{children} </span>
+        <span>{children} </span>
+        <span>{children} </span>
+        <span>{children} </span>
+      </motion.div>
     </div>
+  )
+}
+
+export default function MainText() {
+  return (
+    <section className="absolute left-0 pt-[85vh] pb-[85vh] z-1">
+      <ParallaxText baseVelocity={-5}>This is Zoey`s</ParallaxText>
+      <ParallaxText baseVelocity={5}>Portfolio!</ParallaxText>
+    </section>
   )
 }

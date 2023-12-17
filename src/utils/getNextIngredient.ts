@@ -4,6 +4,7 @@ export interface Ingredient {
 }
 
 export const allIngredients = [
+  // 추후 프로젝트 이미지로 수정
   { icon: '🍅', label: 'Tomato' },
   { icon: '🥬', label: 'Lettuce' },
   { icon: '🧀', label: 'Cheese' },

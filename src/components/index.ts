@@ -1,4 +1,4 @@
 export * from './Header/Header'
 export * from './Nav/Nav'
-export * from './AboutMe/AboutMeSection'
+export * from './AboutMe/AboutMe'
 export * from './Projects/Projects'
