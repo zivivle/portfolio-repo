@@ -1,6 +1,6 @@
 'use client'
 import { motion } from 'framer-motion'
-import { ReactNode } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { AboutMeStep1, AboutMeStep2, AboutMeStep3 } from './components'
 
 const cardVariants = (hueA: number, hueB: number) => ({
@@ -41,6 +41,25 @@ const steps: [ReactNode, number, number][] = [
 ]
 
 export const AboutMe = () => {
+  const [isScrolledPast, setIsScrolledPast] = useState(false)
+
+  // 스크롤 위치에 따라 isScrolledPast 상태를 업데이트하는 함수
+  const handleScroll = () => {
+    if (window.scrollY >= 300) {
+      setIsScrolledPast(true)
+    } else {
+      setIsScrolledPast(false)
+    }
+  }
+
+  // 컴포넌트가 마운트될 때 이벤트 리스너를 추가하고, 언마운트될 때 제거
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll)
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
   return (
     <div className="flex justify-center items-center relative">
       <motion.div
@@ -60,7 +79,9 @@ export const AboutMe = () => {
             viewport={{ once: true, amount: 0.8 }}
             className="mb-6 ml-[4rem] w-[100%]"
           >
-            {StepComponent}
+            <div className="max-w-[90%] h-[700px] rounded overflow-hidden shadow-lg bg-slate-300 p-4">
+              <div style={{ transform: isScrolledPast ? `rotate(${-hueB}deg)` : undefined }}>{StepComponent}</div>
+            </div>
           </motion.div>
         ))}
       </motion.div>
